@@ -1,7 +1,7 @@
 <?php
 
 /*
- * This file is part of the Tusk RedisQueue package.
+ * This file is part of the Tusk RedisMq package.
  *
  * (c) 2012 Tusk PHP Components <frizzy@paperjaw.com>
  *
@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Tusk\RedisQueue;
+namespace Tusk\RedisMq;
 
 /**
  * Rpc
