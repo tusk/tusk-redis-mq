@@ -44,33 +44,20 @@ class Producer
     /**
      * Publish message
      *
-     * @param mixed $body    Message body
-     * @param array $options Publish options
+     * @param mixed|Message $body    Message body|Message
+     * @param array         $options Publish options
      */
-    public function publish($body, $options = array())
+    public function publish($message)
     {
-        $message = array('options' => $options, 'body' => $body);
-        $this->connection->getRedis()->lpush(
-            $this->connection->formatKey($this->channel),
-            $this->serialize($message)
-        );
+        if (! $message instanceof Message) {
+            $message = new Message($message);
+        }
+        $this->connection->publish($this->channel, $message);
         if (isset($this->options['channelExpire'])) {
-            $this->connection->getRedis()->expire(
-                $this->connection->formatKey($this->channel),
+            $this->connection->setChannelExpire(
+                $this->channel,
                 $this->options['channelExpire']
             );
         }
-    }
-
-    /**
-     * Serialize message
-     *
-     * @param array $message Message
-     *
-     * @return string Serialized message
-     */
-    public function serialize($message)
-    {
-        return serialize($message);
     }
 }

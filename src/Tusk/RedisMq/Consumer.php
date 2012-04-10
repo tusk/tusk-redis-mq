@@ -50,12 +50,9 @@ class Consumer
      */
     public function listen($timeout = 0)
     {
-        $message = $this->connection->getRedis()->brpop(
-            $this->connection->formatKey($this->channel),
-            $timeout
-        );
+        $message = $this->connection->getMessage($this->channel, $timeout);
         if (null !== $message) {
-            $this->consume($message[1]);
+            $this->consume($message);
             return true;
         }
 
@@ -65,49 +62,42 @@ class Consumer
     /**
      * Consume
      *
-     * @param string $message Serialized message
+     * @param Message $message Message
      */
-    private function consume($message)
+    private function consume(Message $message)
     {
-        $message = $this->unserialize($message);
         if ($this->callback instanceof \Closure
             || is_object($this->callback)) {
-            $response = $this->callback->__invoke($message['body'], $message['options']);
+            $response = $this->callback->__invoke($message);
         } else {
-            $response = call_user_func(
-                $this->callback,
-                $message['body'],
-                $message['options']
-            );
+            $response = call_user_func($this->callback, $message);
         }
-        if (isset($message['options']['rpcChannel'])) {
-            $options = array();
-            if (isset($message['options']['rpcChannelExpire'])) {
-                $options = array(
-                    'channelExpire' => $message['options']['rpcChannelExpire']
-                );
-            }
-            $producer = new Producer(
-                $message['options']['rpcChannel'],
-                $this->connection,
-                $options
-            );
-            $producer->publish(
-                $response,
-                array('requestId' => $message['options']['requestId'])
-            );
+        if ($message->hasRpcChannel()) {
+            $this->publishRpcResponse($message, $response);
         }
     }
 
     /**
-     * Unserialize
+     * Publish RPC response
      *
-     * @param string $message Serialized message
-     *
-     * @return array Unserialized message
+     * @param Message $message  Message
+     * @param mixed   $response RPC response
      */
-    private function unserialize($message)
+    private function publishRpcResponse(Message $message, $response)
     {
-        return unserialize($message);
+        $options = array();
+        if ($message->hasRpcChannelExpire()) {
+            $options = array(
+                'channelExpire' => $message->getRpcChannelExpire()
+            );
+        }
+        $producer = new Producer(
+            $message->getRpcChannel(),
+            $this->connection,
+            $options
+        );
+        $response = new Message($response);
+        $response->setRequestId($message->getRequestId());
+        $producer->publish($response);
     }
 }

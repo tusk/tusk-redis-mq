@@ -65,13 +65,15 @@ class Rpc
             );
         }
         $this->requests[$requestId] = $channel;
+
+        $message = new Message();
+        $message->body = $body;
+        $message->setRpcChannel($this->channel);
+        $message->setRpcChannelExpire($this->getChannelExpire());
+        $message->setRequestId($requestId);
+
         $producer = new Producer($channel, $this->connection);
-        $options = array(
-            'rpcChannel'       => $this->channel,
-            'rpcChannelExpire' => $this->getChannelExpire(),
-            'requestId'        => $requestId
-        );
-        $producer->publish($body, $options);
+        $producer->publish($message);
     }
 
     /**
@@ -84,8 +86,8 @@ class Rpc
         $responses = array_fill_keys(array_keys($this->requests), null);
         $consumer = new Consumer(
             $this->channel,
-            function ($body, $options) use (&$responses) {
-                $responses[$options['requestId']] = $body;
+            function ($message) use (&$responses) {
+                $responses[$message->getRequestId()] = $message->body;
             },
             $this->connection
         );
@@ -151,7 +153,9 @@ class Rpc
     }
 
     /**
-     * Get RPC channel expire time
+     * Get RPC channel expiration
+     *
+     * @return integer Channel expiration
      */
     private function getChannelExpire()
     {

@@ -25,6 +25,7 @@ class Connection
 
     private $redis;
     private $keyPrefix;
+    private $messageMapper;
 
     /**
      * Construct
@@ -34,6 +35,58 @@ class Connection
     public function __construct(PredisClient $redis)
     {
         $this->redis = $redis;
+        /**
+         * @todo Options for customizing mapper
+         */
+        $this->messageMapper = new MessageMapper();
+    }
+
+    /**
+     * Get message
+     *
+     * @param string  $channel Channel
+     * @param integer $timeout Listen timeout
+     *
+     * @return Message Message | NULL Timeout reached
+     */
+    public function getMessage($channel, $timeout)
+    {
+        $data = $this->getRedis()->brpop(
+            $this->formatKey($channel),
+            $timeout
+        );
+        if (null !== $data) {
+            $message = new Message();
+            $this->messageMapper->load($message, $data[1]);
+            return $message;
+        }
+
+        return null;
+    }
+
+    /**
+     * Publish
+     *
+     * @param string  $channel Channel
+     * @param Message $message Message
+     */
+    public function publish($channel, Message $message)
+    {
+        $this->getRedis()->lpush(
+            $this->formatKey($channel),
+            $this->messageMapper->save($message)
+        );
+    }
+
+    /**
+     * Set channel expiration
+     *
+     * @param string  $channel Channel
+     * @param integer $expire  Channel expiration
+     */
+    public function setChannelExpire($channel, $expire)
+    {
+        $this->getRedis()->expire($this->formatKey($channel), $expire);
     }
 
     /**
