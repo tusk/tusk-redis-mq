@@ -60,4 +60,24 @@ class Producer
             );
         }
     }
+    
+    /**
+     * Get connection
+     * 
+     * @return Connection Connection
+     */
+    public function getConnection()
+    {
+       return $this->connection; 
+    }
+    
+    /**
+     * Get channel
+     *
+     * @return string Channel
+     */
+    public function getChannel()
+    {
+        return $this->channel;
+    }
 }
