@@ -21,6 +21,7 @@
         "predis/predis": "If you want to use predis (currently only v0.7.x is supported)."
     },
     "autoload": {
-        "psr-0": {"Tusk": "src/"}
-    }
+        "psr-0": {"Tusk\\RedisMq": "src/"}
+    },
+    "target-dir": "Tusk/RedisMq"
 }
