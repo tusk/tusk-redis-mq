@@ -1,0 +1,23 @@
+{
+    "name": "tusk/tusk-redis-mq",
+    "type": "library",
+    "description": "A simple producer/consumer and RPC message queue on top of Redis and the equally fantastic Predis",
+    "keywords": ["redis", "message", "queue"],
+    "homepage": "http://github.com/tusk/tusk-redis-mq",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Bernard van Niekerk",
+            "email": "frizzy@paperjaw.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.2"
+    },
+    "suggest": {
+        "predis/predis": "If you want to use predis (currently only v0.7.x is supported)."
+    },
+    "autoload": {
+        "psr-0": {"Tusk\\RedisMq": "src/"}
+    }
+}
