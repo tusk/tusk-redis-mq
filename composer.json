@@ -14,9 +14,6 @@
     "require": {
         "php": ">=5.3.2"
     },
-    "suggest": {
-        "predis/predis": "If you want to use predis (currently only v0.7.x is supported)."
-    },
     "autoload": {
         "psr-0": {"Tusk\\RedisMq": "src/"}
     }

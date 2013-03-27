@@ -12,7 +12,6 @@
 namespace Tusk\RedisMq;
 
 use DateTime;
-use Predis\Client as PredisClient;
 
 /**
  * Connection
@@ -30,9 +29,9 @@ class Connection
     /**
      * Construct
      *
-     * @param PredisClient $redis Predis client
+     * @param Object $redis Redis client
      */
-    public function __construct(PredisClient $redis)
+    public function __construct($redis)
     {
         $this->redis = $redis;
         /**
