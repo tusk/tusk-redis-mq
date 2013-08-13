@@ -146,10 +146,6 @@ class MessageMapper
      */
     private static function camelize($value)
     {
-        return preg_replace(
-            array('/(?:^|_)+(.)/e', '/\.(.)/e'),
-            array("strtoupper('\\1')", "'_'.strtoupper('\\1')"),
-            $value
-        );
+        return strtr(ucwords(strtr($value, array('_' => ' ', '.' => '_ '))), array(' ' => ''));
     }
 }
