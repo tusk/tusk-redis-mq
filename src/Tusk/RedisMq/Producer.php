@@ -44,15 +44,16 @@ class Producer
     /**
      * Publish message
      *
-     * @param mixed|Message $body    Message body|Message
-     * @param array         $options Publish options
+     * @param mixed|Message $body          Message body|Message
+     * @param array         $options       Publish options
+     * @param boolean       $appendToQueue Append message to queue
      */
-    public function publish($message)
+    public function publish($message, $appendToQueue = false)
     {
         if (! $message instanceof Message) {
             $message = new Message($message);
         }
-        $this->connection->publish($this->channel, $message);
+        $this->connection->publish($this->channel, $message, $appendToQueue);
         if (isset($this->options['channelExpire'])) {
             $this->connection->setChannelExpire(
                 $this->channel,
@@ -60,17 +61,17 @@ class Producer
             );
         }
     }
-    
+
     /**
      * Get connection
-     * 
+     *
      * @return Connection Connection
      */
     public function getConnection()
     {
-       return $this->connection; 
+       return $this->connection;
     }
-    
+
     /**
      * Get channel
      *

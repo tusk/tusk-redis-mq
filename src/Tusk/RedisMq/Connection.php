@@ -67,12 +67,13 @@ class Connection
     /**
      * Publish
      *
-     * @param string  $channel Channel
-     * @param Message $message Message
+     * @param string  $channel       Channel
+     * @param Message $message       Message
+     * @param boolean $appendToQueue Append message to queue
      */
-    public function publish($channel, Message $message)
+    public function publish($channel, Message $message, $appendToQueue = false)
     {
-        $this->getRedis()->lpush(
+        $this->getRedis()->{$appendToQueue ? 'rpush' : 'lpush'}(
             $this->formatKey($channel),
             $this->messageMapper->save($message)
         );
