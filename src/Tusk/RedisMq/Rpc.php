@@ -56,11 +56,12 @@ class Rpc
     /**
      * Add request
      *
-     * @param string $channel   Channel
-     * @param mixed  $body      Message body
-     * @param scalar $requestId Request ID
+     * @param string  $channel       Channel
+     * @param mixed   $body          Message body
+     * @param scalar  $requestId     Request ID
+     * @param boolean $appendToQueue Append message to queue
      */
-    public function addRequest($channel, $body, $requestId = null)
+    public function addRequest($channel, $body, $requestId = null, $appendToQueue = false)
     {
         if (null === $requestId) {
             $requestId = count($this->requests);
@@ -71,7 +72,7 @@ class Rpc
         }
         $this->requests[$requestId]     = $channel;
         $this->requestBodies[$requestId] = $body;
-        $this->publish($requestId);
+        $this->publish($requestId, $appendToQueue);
     }
 
     /**
@@ -133,9 +134,10 @@ class Rpc
     /**
      * Publish
      *
-     * @param scalar $requestId Request id
+     * @param scalar  $requestId     Request id
+     * @param boolean $appendToQueue Append message to queue
      */
-    private function publish($requestId)
+    private function publish($requestId, $appendToQueue = false)
     {
         $message = new Message();
         $message->body = $this->requestBodies[$requestId];
@@ -143,7 +145,7 @@ class Rpc
         $message->setRpcChannelExpire($this->getChannelExpire());
         $message->setRequestId($requestId);
         $producer = new Producer($this->requests[$requestId], $this->connection);
-        $producer->publish($message);
+        $producer->publish($message, $appendToQueue);
     }
 
     /**
