@@ -11,16 +11,10 @@
             "email": "frizzy@paperjaw.com"
         }
     ],
-    "require-dev": {
-        "predis/predis": "0.7.*"
-    },
     "require": {
         "php": ">=5.3.2"
     },
-    "suggest": {
-        "predis/predis": "If you want to use predis (currently only v0.7.x is supported)."
-    },
     "autoload": {
-        "psr-0": {"Tusk\\RedisMq": "src/"}
+        "psr-4": {"Tusk\\RedisMq\\": ""}
     }
 }
